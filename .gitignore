@@ -1,6 +1,7 @@
  
 # Virtual environment folder
 eenv/
+elearn/
 
 # Python cache files
 _pycache_/
