@@ -19,6 +19,6 @@ urlpatterns = [
     # url for approval and rejection of staff and student profile
     path('approve/<int:user_id>/<str:role>/', views.approve_user, name='approve_user'),
     path('reject/<int:user_id>/<str:role>/', views.reject_user, name='reject_user'),
-    # adding course Url
+    # adding course URL
     path("add_course/", views.add_course, name="add_course"),
 ]
