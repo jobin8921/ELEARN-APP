@@ -2,18 +2,33 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from .models import Student, Staff, Course
+from django.http import HttpResponse
 
 def index(request):
     return render(request, 'index.html')
 
 def register_student(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = User.objects.create_user(username=username, password=password)
-        Student.objects.create(user=user, is_approved=False)
-        return redirect('login_student')
-    return render(request, 'register_student.html')
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+        gender = request.POST["gender"]
+        course_id = request.POST["course"]
+        email = request.POST["email"]
+        phone = request.POST["phone"]
+
+        if User.objects.filter(username=username).exists():
+            return HttpResponse("Username already exists")
+
+        user = User.objects.create_user(username=username, password=password, email=email)
+        course = Course.objects.get(id=course_id)  # Get selected course
+
+        student = Student.objects.create(
+            user=user, gender=gender, course=course, email=email, phone=phone
+        )
+        return HttpResponse("Registration successful. Wait for admin approval.")
+
+    courses = Course.objects.all()  # Get all courses for dropdown
+    return render(request, "register_student.html", {"courses": courses})
 
 def login_student(request):
     if request.method == 'POST':
