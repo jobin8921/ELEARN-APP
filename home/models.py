@@ -8,7 +8,7 @@ class Student(models.Model):
     is_approved = models.BooleanField(default=False)
     is_rejected = models.BooleanField(default=False)
 
-# Mode for Adding COurse
+# Model for Adding Course
 class Course(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
