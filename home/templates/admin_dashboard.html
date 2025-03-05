@@ -67,6 +67,7 @@
             <table class="table table-bordered table-striped">
                 <thead class="table-dark">
                     <tr>
+                        <th>Username</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
@@ -79,6 +80,7 @@
                 <tbody>
                     {% for staff_member in staff %}
                     <tr>
+                        <td>{{ staff_member.user.username }}</td>
                         <td>{{ staff_member.name }}</td>
                         <td>{{ staff_member.email }}</td>
                         <td>{{ staff_member.phone }}</td>
