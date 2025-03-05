@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from .models import Student, Staff, Course
@@ -157,3 +157,27 @@ def available_courses(request):
     courses = Course.objects.all()
     registered_courses = StudentCourseRegistration.objects.filter(student=student).values_list("course_id", flat=True)
     return render(request, "available_courses.html", {"courses": courses, "registered_courses": registered_courses})
+
+def assign_course(request):
+    if request.method == "POST":
+        staff_id = request.POST.get("staff_id")
+        course_id = request.POST.get("course_id")
+
+        print(f"Staff ID: {staff_id}, Course ID: {course_id}")  # ✅ Debugging Output
+
+        # Ensure staff and course exist
+        staff = get_object_or_404(Staff, id=staff_id)
+        course = get_object_or_404(Course, id=course_id)
+
+        # Assign the course
+        staff.assigned_course = course
+        staff.save()
+
+        print(f"Assigned Course: {staff.assigned_course}")  # ✅ Debugging Output
+
+        messages.success(request, f"Assigned '{course.name}' to {staff.name} successfully!")
+        return redirect("admin_dashboard")  # ✅ Redirect after assignment
+
+    staff = Staff.objects.filter(is_approved=True)  # ✅ Only approved staff
+    courses = Course.objects.all()
+    return render(request, "admin_dashboard.html", {"staff": staff, "courses": courses})

@@ -86,12 +86,13 @@
                         <td>{{ staff_member.phone }}</td>
                         <td>{{ staff_member.gender }}</td>
                         <td>
-                            {% for course in staff_member.courses.all %}
-                                <span class="badge bg-info">{{ course.name }}</span>
-                            {% empty %}
-                                <span class="text-muted">No courses assigned</span>
-                            {% endfor %}
+                            {% if staff_member.assigned_course %}  
+                                <span class="badge bg-info">{{ staff_member.assigned_course.name }}</span>  <!-- ✅ Show assigned course -->
+                            {% else %}
+                                <span class="text-muted">No course assigned</span>
+                            {% endif %}
                         </td>
+                        
                         <td>
                             {% if staff_member.is_approved %}
                                 Approved
@@ -115,28 +116,43 @@
 
         <!-- Assign Course to Staff -->
         <h3 class="mt-4">Assign Course to Staff</h3>
+        {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
         <form method="POST" class="row g-3">
             {% csrf_token %}
             <div class="col-md-4">
                 <select name="staff_id" class="form-control" required>
                     <option value="" disabled selected>Select Staff</option>
                     {% for staff_member in staff %}
-                        <option value="{{ staff_member.id }}">{{ staff_member.name }}</option>
+                        {% if staff_member.is_approved %}
+                            <option value="{{ staff_member.id }}">{{ staff_member.name }}</option>
+                        {% endif %}
                     {% endfor %}
                 </select>
             </div>
             <div class="col-md-4">
-                <select name="course_id" class="form-control" required>
-                    <option value="" disabled selected>Select Course</option>
+                <select name="course_ids" class="form-control" multiple required>
                     {% for course in courses %}
                         <option value="{{ course.id }}">{{ course.name }}</option>
                     {% endfor %}
                 </select>
+                <small class="text-muted">Hold Ctrl (Windows) or Command (Mac) to select multiple courses.</small>
             </div>
             <div class="col-md-4">
                 <button type="submit" class="btn btn-primary w-100">Assign Course</button>
             </div>
         </form>
+
+
 
         <!-- Courses Section -->
         <h3 class="mt-4">Available Courses</h3>
