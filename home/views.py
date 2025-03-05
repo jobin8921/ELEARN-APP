@@ -113,7 +113,10 @@ def student_dashboard(request):
     return render(request, 'student_dashboard.html')
 
 def staff_dashboard(request):
-    return render(request, 'staff_dashboard.html')
+    # Fetch the staff profile, return None if not found
+    staff = Staff.objects.filter(user=request.user).first()
+
+    return render(request, 'staff_dashboard.html', {'staff': staff})
 
 def approve_user(request, user_id, role):
     if role == "student":
