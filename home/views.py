@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from .models import Student, Staff, Course
+from django.contrib import messages
 from django.http import HttpResponse
 
 def index(request):
@@ -45,12 +46,33 @@ def login_student(request):
     return render(request, 'login_Student.html')
 
 def register_staff(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = User.objects.create_user(username=username, password=password)
-        Staff.objects.create(user=user, is_approved=False)
-        return redirect('login_staff')
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        phone = request.POST.get("phone")
+        gender = request.POST.get("gender")
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists. Please choose another.")
+            return redirect("register_staff")
+
+        # Create user
+        user = User.objects.create_user(username=username, password=password, email=email)
+
+        # Create staff profile (Pending approval)
+        Staff.objects.create(
+            user=user,
+            name=name,
+            phone=phone,
+            gender=gender,
+            is_approved=False,  # Staff needs admin approval
+            is_rejected=False
+        )
+
+        messages.success(request, "Registration successful! Wait for admin approval before logging in.")
+        return redirect("login_staff")
     return render(request, 'register_staff.html')
 
 def login_staff(request):
