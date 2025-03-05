@@ -47,15 +47,21 @@ def login_student(request):
 
 def register_staff(request):
     if request.method == "POST":
-        username = request.POST.get("username")
+        username = request.POST.get("username").strip().lower()  # Normalize username
         password = request.POST.get("password")
         name = request.POST.get("name")
-        email = request.POST.get("email")
+        email = request.POST.get("email").strip().lower()
         phone = request.POST.get("phone")
         gender = request.POST.get("gender")
 
-        if User.objects.filter(username=username).exists():
+        # Check if username exists (case-insensitive)
+        if User.objects.filter(username__iexact=username).exists():
             messages.error(request, "Username already exists. Please choose another.")
+            return redirect("register_staff")
+
+        # Check if email exists in Staff table
+        if Staff.objects.filter(email__iexact=email).exists():
+            messages.error(request, "Email already exists. Please use another email.")
             return redirect("register_staff")
 
         # Create user
@@ -65,6 +71,7 @@ def register_staff(request):
         Staff.objects.create(
             user=user,
             name=name,
+            email=email,
             phone=phone,
             gender=gender,
             is_approved=False,  # Staff needs admin approval
@@ -73,7 +80,9 @@ def register_staff(request):
 
         messages.success(request, "Registration successful! Wait for admin approval before logging in.")
         return redirect("login_staff")
+
     return render(request, 'register_staff.html')
+
 
 def login_staff(request):
     if request.method == 'POST':
