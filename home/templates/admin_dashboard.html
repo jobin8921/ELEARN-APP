@@ -9,7 +9,17 @@
 <body>
     <div class="container mt-5">
         <h2 class="text-center">Admin Dashboard</h2>
-        
+
+        <!-- Flash Messages -->
+        {% if messages %}
+            <div class="alert alert-info">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Students Section -->
         <h3 class="mt-4">Students</h3>
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
@@ -50,43 +60,83 @@
                 </tbody>
             </table>
         </div>
-        
+
+        <!-- Staff Section -->
         <h3 class="mt-4">Staff</h3>
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
                 <thead class="table-dark">
                     <tr>
-                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Gender</th>
+                        <th>Assigned Courses</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for staff in staff %}
+                    {% for staff_member in staff %}
                     <tr>
-                        <td>{{ staff.user.username }}</td>
+                        <td>{{ staff_member.name }}</td>
+                        <td>{{ staff_member.email }}</td>
+                        <td>{{ staff_member.phone }}</td>
+                        <td>{{ staff_member.gender }}</td>
                         <td>
-                            {% if staff.is_approved %}
+                            {% for course in staff_member.courses.all %}
+                                <span class="badge bg-info">{{ course.name }}</span>
+                            {% empty %}
+                                <span class="text-muted">No courses assigned</span>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% if staff_member.is_approved %}
                                 Approved
-                            {% elif staff.is_rejected %}
+                            {% elif staff_member.is_rejected %}
                                 Rejected
                             {% else %}
                                 Pending
                             {% endif %}
                         </td>
                         <td>
-                            {% if not staff.is_approved and not staff.is_rejected %}
-                                <a href="{% url 'approve_user' staff.id 'staff' %}" class="btn btn-success btn-sm">Approve</a>
-                                <a href="{% url 'reject_user' staff.id 'staff' %}" class="btn btn-danger btn-sm">Reject</a>
+                            {% if not staff_member.is_approved and not staff_member.is_rejected %}
+                                <a href="{% url 'approve_user' staff_member.id 'staff' %}" class="btn btn-success btn-sm">Approve</a>
+                                <a href="{% url 'reject_user' staff_member.id 'staff' %}" class="btn btn-danger btn-sm">Reject</a>
                             {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
-                
             </table>
         </div>
 
+        <!-- Assign Course to Staff -->
+        <h3 class="mt-4">Assign Course to Staff</h3>
+        <form method="POST" class="row g-3">
+            {% csrf_token %}
+            <div class="col-md-4">
+                <select name="staff_id" class="form-control" required>
+                    <option value="" disabled selected>Select Staff</option>
+                    {% for staff_member in staff %}
+                        <option value="{{ staff_member.id }}">{{ staff_member.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select name="course_id" class="form-control" required>
+                    <option value="" disabled selected>Select Course</option>
+                    {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">Assign Course</button>
+            </div>
+        </form>
+
+        <!-- Courses Section -->
         <h3 class="mt-4">Available Courses</h3>
         <div class="table-responsive">
             <table class="table table-bordered table-hover">
@@ -111,6 +161,7 @@
             </table>
         </div>
 
+        <!-- Logout & Add Courses -->
         <div class="text-center mt-4">
             <a href="{% url 'logout' %}" class="btn btn-primary">Logout</a>
             <a href="{% url 'add_course' %}" class="btn btn-primary">Add Courses</a>
