@@ -26,6 +26,8 @@ class Staff(models.Model):
     gender = models.CharField(max_length=10, null=True, blank=True)
     is_approved = models.BooleanField(default=False)
     is_rejected = models.BooleanField(default=False)
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=True)  # Single course assigned
+
     
 # Model for Admin dashboard
 class AdminProfile(models.Model):
