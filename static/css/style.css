@@ -638,7 +638,7 @@ Version:	1.0
 	Features CSS 
 =================================*/
 .features {
-	background-image: url('images/feature-bg.jpg');
+	background-image: url('/static/images/feature-bg.jpg');
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
@@ -1975,7 +1975,7 @@ Version:	1.0
 }
 .footer .footer-top {
 	padding: 60px 0 90px;
-	background-image: url('images/clients-bg.jpg');
+	background-image: url('/static/images/clients-bg.jpg');
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;

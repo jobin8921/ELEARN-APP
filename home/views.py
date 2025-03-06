@@ -168,6 +168,10 @@ def add_course(request):
         return redirect("admin_dashboard")
     return render(request, "courses.html")
 
+
+def course_preview(request):
+    return render(request, 'courses.html') 
+
 def available_courses(request):
     student = Student.objects.get(user=request.user)
     courses = Course.objects.all()
