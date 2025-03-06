@@ -15,7 +15,7 @@ Version:	1.0
 }
 /* Header Inner */
 .header .header-inner {
-	background-image: url('images/bg-pattern1.png');
+	background-image: url('/static/images/bg-pattern1.png');
 	background-repeat: repeat-y;
 	background-position: center;
 	position: relative;
