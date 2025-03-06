@@ -21,4 +21,7 @@ urlpatterns = [
     path('reject/<int:user_id>/<str:role>/', views.reject_user, name='reject_user'),
     # adding course URL
     path("add_course/", views.add_course, name="add_course"),
+    # view for the available courses
+    path('courses_preview/', views.course_preview, name='course_preview'),
+
 ]
