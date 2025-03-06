@@ -26,6 +26,7 @@
                 <thead class="table-dark">
                     <tr>
                         <th>Username</th>
+                        <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Gender</th>
@@ -38,6 +39,7 @@
                     {% for student in students %}
                     <tr>
                         <td>{{ student.user.username }}</td>
+                        <td>{{ student.name}}</td>
                         <td>{{ student.email }}</td>
                         <td>{{ student.phone }}</td>
                         <td>{{ student.gender }}</td>
@@ -51,7 +53,11 @@
                         </td>
                         <td>
                             {% if not student.is_approved and not student.is_rejected %}
-                                <a href="{% url 'approve_user' student.id 'student' %}" class="btn btn-success btn-sm">Approve</a>
+                            <form method="POST" action="{% url 'approve_user' student.id 'student' %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            </form>
+                            
                                 <a href="{% url 'reject_user' student.id 'student' %}" class="btn btn-danger btn-sm">Reject</a>
                             {% endif %}
                         </td>
