@@ -59,7 +59,9 @@
 						<div class="col-lg-3 col-md-3 col-12">
 							<!-- Logo -->
 							<div class="logo">
+
 								<a href="/"><img src="{% static 'images/logo.png' %}" alt="#"></a>
+
 							</div>
 							<!--/ End Logo -->
 							<div class="mobile-menu"></div>
@@ -70,15 +72,19 @@
 									<div class="navbar-collapse">
 										<!-- Main Menu -->
 										<ul id="nav" class="nav menu navbar-nav">
+
 											<li class="active"><a href="/"><i class="fa fa-home"></i>Home</a></li>
+
 											<li><a href="#"><i class="fa fa-clone"></i>Pages</a> 
 												<ul class="dropdown">
 													<li><a href="teachers.html">Teachers</a></li>
 												</ul>
 											</li>
+
 											<li><a href="{% url 'course_preview' %}"><i class="fa fa-clone"></i>Our Courses</a></li>
 											<li><a href="events.html"><i class="fa fa-bullhorn"></i>Events</a></li>
 											<li><a href=""><i class="fa fa-address-book"></i>Contact</a> </li>
+
 											<li><a href="{% url 'login_staff' %}"><i class="fa fa-address-book"></i>Staff</a> </li>
 											<li><a href="{% url 'login_student'%}"><i class="fa fa-address-book"></i>Student</a> </li>
 											<li><a href="{% url 'admin_dashboard' %}"><i class="fa fa-address-book"></i>Admin</a> </li>
