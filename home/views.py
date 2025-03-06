@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from .models import Student, Staff, Course
@@ -119,14 +120,27 @@ def staff_dashboard(request):
     return render(request, 'staff_dashboard.html', {'staff': staff})
 
 def approve_user(request, user_id, role):
-    if role == "student":
-        student = Student.objects.get(id=user_id)
-        student.is_approved = True
-        student.save()
-    elif role == "staff":
-        staff = Staff.objects.get(id=user_id)
-        staff.is_approved = True
-        staff.save()
+    if request.method == "POST":
+        if role == "student":
+            student = get_object_or_404(Student, id=user_id)
+            student.is_approved = True
+            student.save()
+            messages.success(request, f"{student.name} has been approved!")
+        
+        elif role == "staff":
+            staff = get_object_or_404(Staff, id=user_id)
+            selected_course_id = request.POST.get("course_id")  # Get selected course
+            
+            if selected_course_id:
+                selected_course = get_object_or_404(Course, id=selected_course_id)
+                staff.is_approved = True
+                staff.course = selected_course  # Assign course
+                staff.save()
+                messages.success(request, f"{staff.name} has been approved and assigned to {selected_course.name}!")
+            else:
+                messages.error(request, "Please select a course before approving staff.")
+                return redirect("admin_dashboard")
+
     return redirect("admin_dashboard")
 
 def reject_user(request, user_id, role):

@@ -72,7 +72,7 @@
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Gender</th>
-                        <th>Assigned Courses</th>
+                        <th>Assigned Course</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
@@ -86,35 +86,52 @@
                         <td>{{ staff_member.phone }}</td>
                         <td>{{ staff_member.gender }}</td>
                         <td>
-                            {% for course in staff_member.courses.all %}
-                                <span class="badge bg-info">{{ course.name }}</span>
-                            {% empty %}
-                                <span class="text-muted">No courses assigned</span>
-                            {% endfor %}
+                            {% if staff_member.course %}
+                                <span class="badge bg-success">{{ staff_member.course.name }}</span>
+                            {% else %}
+                                <span class="text-muted">No course assigned</span>
+                            {% endif %}
                         </td>
                         <td>
                             {% if staff_member.is_approved %}
-                                Approved
+                                <span class="badge bg-success">Approved</span>
                             {% elif staff_member.is_rejected %}
-                                Rejected
+                                <span class="badge bg-danger">Rejected</span>
                             {% else %}
-                                Pending
+                                <span class="badge bg-warning">Pending</span>
                             {% endif %}
                         </td>
                         <td>
                             {% if not staff_member.is_approved and not staff_member.is_rejected %}
-                                <a href="{% url 'approve_user' staff_member.id 'staff' %}" class="btn btn-success btn-sm">Approve</a>
-                                <a href="{% url 'reject_user' staff_member.id 'staff' %}" class="btn btn-danger btn-sm">Reject</a>
+                                <form method="post" action="{% url 'approve_user' staff_member.id 'staff' %}">
+                                    {% csrf_token %}
+                                    <select name="course_id" class="form-select form-select-sm d-inline w-auto" required>
+                                        <option value="" disabled selected>Select a Course</option>
+                                        {% for course in courses %}
+                                            <option value="{{ course.id }}">{{ course.name }}</option>
+                                        {% empty %}
+                                            <option value="" disabled>No courses available</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-success btn-sm mt-1">Approve & Assign</button>
+                                    <a href="{% url 'reject_user' staff_member.id 'staff' %}" class="btn btn-danger btn-sm mt-1">Reject</a>
+                                </form>
+                                
                             {% endif %}
                         </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">No staff members awaiting approval.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        
 
         <!-- Assign Course to Staff -->
-        <h3 class="mt-4">Assign Course to Staff</h3>
+        <!-- <h3 class="mt-4">Assign Course to Staff</h3>
         <form method="POST" class="row g-3">
             {% csrf_token %}
             <div class="col-md-4">
@@ -136,7 +153,7 @@
             <div class="col-md-4">
                 <button type="submit" class="btn btn-primary w-100">Assign Course</button>
             </div>
-        </form>
+        </form> -->
 
         <!-- Courses Section -->
         <h3 class="mt-4">Available Courses</h3>
