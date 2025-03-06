@@ -13,6 +13,7 @@ def register_student(request):
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
+        name = request.POST["name"]
         gender = request.POST["gender"]
         course_id = request.POST["course"]
         email = request.POST["email"]
@@ -25,7 +26,7 @@ def register_student(request):
         course = Course.objects.get(id=course_id)  # Get selected course
 
         student = Student.objects.create(
-            user=user, gender=gender, course=course, email=email, phone=phone
+            user=user, name=name, gender=gender, course=course, email=email, phone=phone
         )
         return HttpResponse("Registration successful. Wait for admin approval.")
 
@@ -124,6 +125,7 @@ def approve_user(request, user_id, role):
         if role == "student":
             student = get_object_or_404(Student, id=user_id)
             student.is_approved = True
+            student.is_rejected = False
             student.save()
             messages.success(request, f"{student.name} has been approved!")
         
