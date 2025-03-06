@@ -6,32 +6,74 @@
     <title>Staff Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-   
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #f4f7f6;
+            font-family: 'Arial', sans-serif;
         }
         .sidebar {
             height: 100vh;
+            width: 260px;
             background-color: #06C46B;
             color: white;
-            padding: 20px;
             position: fixed;
-            width: 250px;
+            padding-top: 20px;
+            transition: all 0.3s ease;
+        }
+        .sidebar h4 {
+            text-align: center;
         }
         .sidebar a {
             color: white;
             text-decoration: none;
-            display: block;
-            padding: 10px;
-            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .sidebar a i {
+            margin-right: 10px;
         }
         .sidebar a:hover {
-            background-color: #06C46B;
+            background-color: #048F54;
         }
         .content {
             margin-left: 270px;
-            padding: 20px;
+            padding: 30px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .btn-custom {
+            background-color: #06C46B;
+            color: white;
+            border-radius: 20px;
+            padding: 8px 16px;
+            transition: 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: #048F54;
+            color: white;
+        }
+        .nav-tabs .nav-link.active {
+            background-color: #06C46B !important;
+            color: white !important;
+        }
+        .nav-tabs .nav-link {
+            color: #06C46B !important;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -41,34 +83,69 @@
     <div class="sidebar">
         <h4>Staff Dashboard</h4>
         <hr>
-        <a href="#">Profile</a>
-        <a href="#">Courses</a>
-        <a href="#">Settings</a>
-        <a href="{% url 'logout' %}">Logout</a>
+        <a href="#"><i class="fas fa-user"></i> Profile</a>
+        <a href="#"><i class="fas fa-file-upload"></i> Upload Notes</a>
+        <a href="{% url 'registered_students' %}"><i class="fas fa-users"></i> Students</a>
+        <a href="#"><i class="fas fa-chalkboard-teacher"></i> Start Exam</a>
+        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
 
     <!-- Main Content -->
     <div class="content">
-        <h2>Welcome {{ staff.name }}</h2>
-        <p>Here are your registration details:</p>
+        <h2>Welcome, {{ staff.name }} 👋</h2>
+        <p>Manage your profile, courses, and students efficiently.</p>
 
+        <!-- Profile Section -->
         <div class="row">
             <div class="col-md-4">
-                <!-- Profile Card -->
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Profile Details</h5>
-                        <p><strong>Name:</strong> {{ staff.name }}</p>
-                        <p><strong>Email:</strong> {{ staff.email }}</p>
-                        <p><strong>Phone:</strong> {{ staff.phone }}</p>
-                        <p><strong>Gender:</strong> {{ staff.gender }}</p>
-                    </div>
+                <div class="card text-center p-3">
+                    <img src="https://via.placeholder.com/100" class="profile-img" alt="Profile">
+                    <h5>{{ staff.name }}</h5>
+                    <p class="text-muted">{{ staff.email }}</p>
                 </div>
             </div>
-
-            
+            <div class="col-md-8">
+                <div class="card p-3">
+                    <h5>Profile Details</h5>
+                    <p><strong>Email:</strong> {{ staff.email }}</p>
+                    <p><strong>Phone:</strong> {{ staff.phone }}</p>
+                    <p><strong>Gender:</strong> {{ staff.gender }}</p>
+                </div>
+            </div>
         </div>
 
+        <!-- Courses Assigned -->
+        <div class="card p-3 mt-3">
+            <h5>Assigned Course</h5>
+            {% if staff.course %}
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <strong>{{ staff.course.name }}</strong> - {{ staff.course.description }}
+                    </li>
+                </ul>
+            {% else %}
+                <p class="text-muted">No course assigned yet.</p>
+            {% endif %}
+        </div>
+        
+
+        <!-- Upload Notes -->
+        <div class="card p-3 mt-3">
+            <h5>Upload Study Materials</h5>
+            <form action="{% url 'upload_notes' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="course">Select Course:</label>
+                <select class="form-control mb-2" name="course">
+                    {% for course in staff.courses.all %}
+                        <option value="{{ course.id }}">{{ course.name }}</option>
+                    {% endfor %}
+                </select>
+                <input type="file" name="pdf_file" class="form-control mb-2">
+                <button type="submit" class="btn btn-custom">Upload</button>
+            </form>
+        </div>
+
+        
     </div>
 
 </body>
