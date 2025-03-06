@@ -24,4 +24,11 @@ urlpatterns = [
     # view for the available courses
     path('courses_preview/', views.course_preview, name='course_preview'),
 
+
+    path('upload-notes/', views.upload_notes, name='upload_notes'),
+
+    # path('start-exam/<int:course_id>/', views.start_exam, name='start_exam'),
+
+    path("students/", views.registered_students, name="registered_students"),
+
 ]

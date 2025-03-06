@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from .models import Student, Staff, Course
 from django.contrib import messages
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+
 
 def index(request):
     return render(request, 'index.html')
@@ -115,10 +117,13 @@ def student_dashboard(request):
     return render(request, 'student_dashboard.html')
 
 def staff_dashboard(request):
-    # Fetch the staff profile, return None if not found
-    staff = Staff.objects.filter(user=request.user).first()
+    staff = Staff.objects.filter(user=request.user).select_related("course").first()
 
-    return render(request, 'staff_dashboard.html', {'staff': staff})
+    if not staff:
+        return HttpResponse("Staff profile not found")
+
+    return render(request, "staff_dashboard.html", {"staff": staff})
+
 
 def approve_user(request, user_id, role):
     if request.method == "POST":
@@ -177,3 +182,38 @@ def available_courses(request):
     courses = Course.objects.all()
     registered_courses = StudentCourseRegistration.objects.filter(student=student).values_list("course_id", flat=True)
     return render(request, "available_courses.html", {"courses": courses, "registered_courses": registered_courses})
+
+def upload_notes(request):
+    if request.method == "POST":
+        course_id = request.POST.get("course")
+        pdf_file = request.FILES.get("pdf_file")
+
+        if course_id and pdf_file:
+            course = Course.objects.get(id=course_id)
+            Notes.objects.create(course=course, file=pdf_file)
+            return HttpResponse("Notes uploaded successfully!")
+        else:
+            return HttpResponse("Please select a course and upload a file.")
+
+    return redirect("staff_dashboard")  # Redirect after POST
+
+# def start_exam(request):
+#     if request.method == "POST":
+#         course_id = request.POST.get("course")
+#         course = get_object_or_404(Course, id=course_id)
+
+#         # Redirect to the exam page with the selected course
+#         return render(request, "exam_page.html", {"course": course})
+
+#     return redirect("staff_dashboard")  # Redirect back if accessed incorrectly
+
+
+@login_required
+def registered_students(request):
+    # Get the course assigned to the logged-in staff (assuming 'course' is a ForeignKey)
+    staff_course = request.user.staff.course  # Ensure 'course' exists in Staff model
+    
+    # Fetch students enrolled in that specific course
+    students = Student.objects.filter(course=staff_course)
+    
+    return render(request, "students_list.html", {"students": students})
