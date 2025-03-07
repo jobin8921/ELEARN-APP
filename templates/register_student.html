@@ -52,13 +52,20 @@
                     <button type="submit" class="btn btn-primary w-100">Register</button>
                 </form>
                             {% if messages %}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 915956a8b83e078580f501f2b08d727bc3b44f44
                 {% for message in messages %}
                     <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
                         {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
+<<<<<<< HEAD
                                         
+=======
+>>>>>>> 915956a8b83e078580f501f2b08d727bc3b44f44
 
                 <div class="text-center mt-3">
                     <a href="{% url 'login_student' %}">Already have an account? Login</a>
