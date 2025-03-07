@@ -22,15 +22,18 @@ def register_student(request):
         phone = request.POST["phone"]
 
         if User.objects.filter(username=username).exists():
-            return HttpResponse("Username already exists")
+            messages.error(request, "Username already exists")
+            return redirect("register_student")
 
         user = User.objects.create_user(username=username, password=password, email=email)
         course = Course.objects.get(id=course_id)  # Get selected course
 
-        student = Student.objects.create(
+        Student.objects.create(
             user=user, name=name, gender=gender, course=course, email=email, phone=phone
         )
-        return HttpResponse("Registration successful. Wait for admin approval.")
+
+        messages.success(request, "Registration successful. Wait for admin approval.")
+        return redirect("register_student")
 
     courses = Course.objects.all()  # Get all courses for dropdown
     return render(request, "register_student.html", {"courses": courses})
