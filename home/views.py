@@ -117,7 +117,35 @@ def admin_dashboard(request):
     return render(request, "admin_dashboard.html", {"students": students, "staff": staff, "courses": courses})
 
 def student_dashboard(request):
-    return render(request, 'student_dashboard.html')
+    # Get the logged-in user
+    user = request.user  
+
+    try:
+        # Fetch student details
+        student = Student.objects.get(user=user)
+    except Student.DoesNotExist:
+        return render(request, 'error.html', {'message': 'Student profile not found'})
+
+    # Get assigned staff
+    staff = Staff.objects.filter(course=student.course).first()
+
+
+    # Get upcoming and ongoing exams for the student's course
+    # exams = Exam.objects.filter(course=student.course)
+
+    # Get notifications for the student
+    # notifications = Notification.objects.filter(student=student)
+
+    # Pass student data to the template
+    context = {
+        'student': student,
+        'staff': staff,
+
+        # 'exams': exams,
+        # 'notifications': notifications
+    }
+    
+    return render(request, 'student_dashboard.html', context)
 
 def staff_dashboard(request):
     staff = Staff.objects.filter(user=request.user).select_related("course").first()
@@ -177,7 +205,7 @@ def add_course(request):
         description = request.POST["description"]
         Course.objects.create(name=name, description=description)
         return redirect("admin_dashboard")
-    return render(request, "courses.html")
+    return render(request, "add_courses.html")
 
 
 def course_preview(request):
