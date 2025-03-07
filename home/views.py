@@ -156,15 +156,18 @@ def approve_user(request, user_id, role):
 def reject_user(request, user_id, role):
     try:
         if role == "student":
-            student = Student.objects.get(id=user_id)
-            student.is_rejected = True
-            student.save()
+            student = get_object_or_404(Student, id=user_id)
+            user = student.user  # Get the associated User
+            student.delete()  # Delete student record
+            user.delete()  # Delete user account
         elif role == "staff":
-            staff = Staff.objects.get(id=user_id)
-            staff.is_rejected = True
-            staff.save()
-    except Student.DoesNotExist or Staff.DoesNotExist:
-        pass
+            staff = get_object_or_404(Staff, id=user_id)
+            user = staff.user  # Get the associated User
+            staff.delete()  # Delete staff record
+            user.delete()  # Delete user account
+    except Exception as e:
+        print(f"Error: {e}")  # Log the error if needed
+    
     return redirect("admin_dashboard")
 
 
