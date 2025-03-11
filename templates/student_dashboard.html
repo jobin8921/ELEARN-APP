@@ -164,13 +164,16 @@
         <!-- Notifications -->
         <div class="card p-3 mt-3">
             <h5>Notifications</h5>
-            <ul class="list-group">
-                {% for notification in notifications %}
+            
+            <ul class="list-group mt-3">
+                {% for message in messages %}
                     <li class="list-group-item">
-                        {{ notification.message }} - <small class="text-muted">{{ notification.date }}</small>
+                        <strong>From:</strong> {{ message.staff.name }}<br>
+                        {{ message.content }}<br>
+                        <small class="text-muted">{{ message.created_at|date:"M d, Y H:i" }}</small>
                     </li>
                 {% empty %}
-                    <p class="text-muted">No new notifications.</p>
+                    <li class="list-group-item text-muted">No new messages.</li>
                 {% endfor %}
             </ul>
         </div>

@@ -33,3 +33,9 @@ class Staff(models.Model):
 # Model for Admin dashboard
 class AdminProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+class Message(models.Model):
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)  # Messages are course-specific
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
