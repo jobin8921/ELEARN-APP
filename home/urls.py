@@ -31,4 +31,6 @@ urlpatterns = [
 
     path("students/", views.registered_students, name="registered_students"),
 
+    path("delete_message/<int:message_id>/", views.delete_message, name="delete_message"),
+
 ]
