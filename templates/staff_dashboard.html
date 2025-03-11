@@ -146,6 +146,32 @@
         </div>
 
         
+
+<h3 class="mt-4">Send a Message</h3>
+<form method="POST">
+    {% csrf_token %}
+    <textarea name="message_content" class="form-control" rows="3" placeholder="Write a message..."></textarea>
+    <button type="submit" class="btn btn-primary mt-2">Send</button>
+</form>
+
+<h3 class="mt-4">Messages</h3>
+<ul class="list-group">
+    {% for message in messages %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ message.staff.name }}:</strong> {{ message.content }} <br>
+                <small class="text-muted">{{ message.created_at }}</small>
+            </div>
+            <form method="POST" action="{% url 'delete_message' message.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+        </li>
+    {% empty %}
+        <li class="list-group-item text-muted">No messages yet.</li>
+    {% endfor %}
+</ul>
+        
     </div>
 
 </body>

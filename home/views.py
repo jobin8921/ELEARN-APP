@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from .models import Student, Staff, Course
+from .models import Student, Staff, Course, Message
 from django.contrib import messages
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -134,27 +134,47 @@ def student_dashboard(request):
     # exams = Exam.objects.filter(course=student.course)
 
     # Get notifications for the student
-    # notifications = Notification.objects.filter(student=student)
+    messages = Message.objects.filter(course=student.course).order_by("-created_at")
 
     # Pass student data to the template
     context = {
         'student': student,
         'staff': staff,
-
+        'messages': messages
         # 'exams': exams,
-        # 'notifications': notifications
+        
     }
     
     return render(request, 'student_dashboard.html', context)
 
 def staff_dashboard(request):
+    # Fetch the staff member along with their assigned course
     staff = Staff.objects.filter(user=request.user).select_related("course").first()
 
     if not staff:
         return HttpResponse("Staff profile not found")
 
-    return render(request, "staff_dashboard.html", {"staff": staff})
+    # Fetch students who are assigned to the same course
+    students = Student.objects.filter(course=staff.course)
 
+    # Fetch messages related to the assigned course
+    messages = Message.objects.filter(course=staff.course).order_by("-created_at")
+
+    # Fetch uploaded notes
+    # notes = Notes.objects.filter(course=staff.course).order_by("-uploaded_at")
+
+    if request.method == "POST":
+        message_content = request.POST.get("message_content", "").strip()  # Ensure it's not None
+        
+        if message_content:  # Check if it's not empty
+            Message.objects.create(staff=staff, course=staff.course, content=message_content)
+            return redirect("staff_dashboard")  
+    
+    return render(
+        request, 
+        "staff_dashboard.html", 
+        {"staff": staff, "students": students, "messages": messages}
+    )
 
 def approve_user(request, user_id, role):
     if request.method == "POST":
@@ -251,3 +271,11 @@ def registered_students(request):
     students = Student.objects.filter(course=staff_course)
     
     return render(request, "students_list.html", {"students": students})
+
+def delete_message(request, message_id):
+    message = get_object_or_404(Message, id=message_id)
+
+    if message.staff.user == request.user:
+        message.delete()
+
+    return redirect("staff_dashboard")
