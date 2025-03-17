@@ -6,6 +6,8 @@ from .models import Student, Staff, Course, Message,Exam, Question, ExamResponse
 from django.contrib import messages
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
 
 
 def index(request):
@@ -157,6 +159,9 @@ def staff_dashboard(request):
     if not staff:
         return HttpResponse("Staff profile not found")
 
+    exams = Exam.objects.filter(staff=staff).prefetch_related("examresult_set__student")
+
+    exam_results = {exam: ExamResult.objects.filter(exam=exam).select_related("student") for exam in exams} if exams else {}
     # Fetch students who are assigned to the same course
     students = Student.objects.filter(course=staff.course)
 
@@ -176,7 +181,7 @@ def staff_dashboard(request):
     return render(
         request, 
         "staff_dashboard.html", 
-        {"staff": staff, "students": students, "messages": messages}
+        {"staff": staff, "students": students, "messages": messages, "exam_results": exam_results,}
     )
 
 def approve_user(request, user_id, role):
@@ -294,60 +299,70 @@ def add_question(request, exam_id):
     exam = get_object_or_404(Exam, id=exam_id, staff__user=request.user)
 
     if request.method == "POST":
-        question_text = request.POST["question_text"]
-        option1 = request.POST["option1"]
-        option2 = request.POST["option2"]
-        option3 = request.POST["option3"]
-        option4 = request.POST["option4"]
-        correct_option = request.POST["correct_option"]
+        questions_data = request.POST.getlist('question_text[]')
+        option1_data = request.POST.getlist('option1[]')
+        option2_data = request.POST.getlist('option2[]')
+        option3_data = request.POST.getlist('option3[]')
+        option4_data = request.POST.getlist('option4[]')
+        correct_option_data = request.POST.getlist('correct_option[]')
 
-        Question.objects.create(
-            exam=exam,
-            question_text=question_text,
-            option1=option1,
-            option2=option2,
-            option3=option3,
-            option4=option4,
-            correct_option=correct_option,
-        )
+        for i in range(len(questions_data)):
+            if questions_data[i].strip():
+                Question.objects.create(
+                    exam=exam,
+                    question_text=questions_data[i],
+                    option1=option1_data[i],
+                    option2=option2_data[i],
+                    option3=option3_data[i],
+                    option4=option4_data[i],
+                    correct_option=correct_option_data[i],
+                )
+
         return redirect("staff_dashboard")
 
     return render(request, "add_question.html", {"exam": exam})
+
 
 
 @login_required
 def take_exam(request, exam_id):
     student = get_object_or_404(Student, user=request.user)
     exam = get_object_or_404(Exam, id=exam_id, course=student.course)
-    questions = exam.questions.all()  # Fetch all related questions
+    questions = exam.questions.all()
 
     if request.method == "POST":
         score = 0
-        total_questions = questions.count()
+        responses = []
 
         for question in questions:
-            selected_option = request.POST.get(f"question_{question.id}", None)
+            selected_option = request.POST.get(f"question_{question.id}")  # Get selected answer
 
             if selected_option:
-                # Avoid duplicate responses
-                ExamResponse.objects.update_or_create(
-                    student=student, exam=exam, question=question,
-                    defaults={"selected_option": selected_option}
-                )
+                # Store responses in a list to bulk update later
+                responses.append(ExamResponse(
+                    student=student,
+                    exam=exam,
+                    question=question,
+                    selected_option=selected_option
+                ))
 
+                # Check if the selected answer is correct
                 if selected_option == question.correct_option:
                     score += 1
 
-        # Save exam result
+        # Bulk update exam responses
+        ExamResponse.objects.bulk_create(responses, ignore_conflicts=True)
+
+        # Save or update exam result
         ExamResult.objects.update_or_create(
             student=student, exam=exam,
-            defaults={"score": score, "total_questions": total_questions}
+            defaults={"score": score, "total_questions": len(questions)}
         )
 
-        return redirect("view_exam_results", exam_id=exam.id,)
-
+        return redirect("view_exam_results", exam_id=exam.id)
 
     return render(request, "take_exam.html", {"exam": exam, "questions": questions})
+
 
 
 @login_required
@@ -367,3 +382,34 @@ def view_exam_results(request, exam_id):
         results = ExamResult.objects.filter(exam=exam)
 
     return render(request, "view_exam_results.html", {"exam": exam, "results": results})
+
+def student_result(request):
+    staff = Staff.objects.filter(user=request.user).first()
+
+    if not staff:
+        return HttpResponse("Staff profile not found")
+
+    exams = Exam.objects.filter(staff=staff).prefetch_related("examresult_set__student")
+    exam_results = {exam: ExamResult.objects.filter(exam=exam).select_related("student") for exam in exams}
+
+    return render(request, "exam_results.html", {"exam_results": exam_results})
+
+
+def generate_exam_results_pdf(request):
+    staff = Staff.objects.filter(user=request.user).first()
+
+    if not staff:
+        return HttpResponse("Staff profile not found")
+
+    exams = Exam.objects.filter(staff=staff).prefetch_related("examresult_set__student")
+    exam_results = {exam: ExamResult.objects.filter(exam=exam).select_related("student") for exam in exams}
+
+    html_content = render_to_string("exam_results_pdf.html", {"exam_results": exam_results})
+    response = HttpResponse(content_type="application/pdf")
+    response["content-Disposition"] = "attachment; filename=exam_results.pdf"
+
+    pisa_status = pisa.CreatePDF(html_content, dest=response)
+    if pisa_status.err:
+        return HttpResponse("Error generating PDF", status=500)
+
+    return response
