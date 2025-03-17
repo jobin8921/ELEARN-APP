@@ -131,6 +131,8 @@ def student_dashboard(request):
 
     staff = Staff.objects.filter(course=student.course).first()
 
+    taken_exam_ids = ExamResult.objects.filter(student=student).values_list("exam_id", flat=True)
+
 
 
     # Get notifications for the student
@@ -141,7 +143,8 @@ def student_dashboard(request):
         'student': student,
         'staff': staff,
         'messages': messages,
-        "exams": exams
+        "exams": exams,
+        "taken_exam_ids": taken_exam_ids
         
     }
     
