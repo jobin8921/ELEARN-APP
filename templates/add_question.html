@@ -1,0 +1,10 @@
+<form method="POST">
+    {% csrf_token %}
+    <textarea name="question_text" placeholder="Question" required></textarea>
+    <input type="text" name="option1" placeholder="Option 1" required>
+    <input type="text" name="option2" placeholder="Option 2" required>
+    <input type="text" name="option3" placeholder="Option 3" required>
+    <input type="text" name="option4" placeholder="Option 4" required>
+    <input type="number" name="correct_option" placeholder="Correct Option (1-4)" required>
+    <button type="submit">Add Question</button>
+</form>

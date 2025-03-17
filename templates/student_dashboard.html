@@ -147,19 +147,7 @@
         </div>
 
         <!-- Exams -->
-        <div class="card p-3 mt-3">
-            <h5>Upcoming & Ongoing Exams</h5>
-            <ul class="list-group">
-                {% for exam in exams %}
-                    <li class="list-group-item">
-                        <strong>{{ exam.title }}</strong> - {{ exam.date }} 
-                        <a href="{% url 'start_exam' exam.id %}" class="btn btn-sm btn-custom">Start Exam</a>
-                    </li>
-                {% empty %}
-                    <p class="text-muted">No exams scheduled.</p>
-                {% endfor %}
-            </ul>
-        </div>
+        <!--  -->
 
         <!-- Notifications -->
         <div class="card p-3 mt-3">
@@ -178,6 +166,21 @@
             </ul>
         </div>
     </div>
+
+            {% if exams %}
+            <h3>Available Exams</h3>
+            <ul>
+                {% for exam in exams %}
+                    <li>
+                        {{ exam.title }} ({{ exam.date }})
+                        <a href="{% url 'take_exam' exam.id %}">Take Exam</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No exams available for your course.</p>
+        {% endif %}
+
 
 </body>
 </html>

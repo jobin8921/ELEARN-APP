@@ -1,0 +1,17 @@
+<h3>Results for {{ exam.title }}</h3>
+<table>
+    <tr>
+        <th>Student</th>
+        <th>Score</th>
+        <th>Total Questions</th>
+        <th>Date Submitted</th>
+    </tr>
+    {% for result in results %}
+    <tr>
+        <td>{{ result.student.name }}</td>
+        <td>{{ result.score }}</td>
+        <td>{{ result.total_questions }}</td>
+        <td>{{ result.date_submitted }}</td>
+    </tr>
+    {% endfor %}
+</table>

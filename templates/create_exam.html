@@ -1,0 +1,7 @@
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="title" placeholder="Exam Title" required>
+    <input type="datetime-local" name="date" required>
+    <input type="number" name="duration" placeholder="Duration (mins)" required>
+    <button type="submit">Create Exam</button>
+</form>

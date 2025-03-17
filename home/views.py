@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from .models import Student, Staff, Course, Message
+from .models import Student, Staff, Course, Message,Exam, Question, ExamResponse, ExamResult
 from django.contrib import messages
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -127,11 +127,11 @@ def student_dashboard(request):
         return render(request, 'error.html', {'message': 'Student profile not found'})
 
     # Get assigned staff
+    exams = Exam.objects.filter(course=student.course)
+
     staff = Staff.objects.filter(course=student.course).first()
 
 
-    # Get upcoming and ongoing exams for the student's course
-    # exams = Exam.objects.filter(course=student.course)
 
     # Get notifications for the student
     messages = Message.objects.filter(course=student.course).order_by("-created_at")
@@ -140,8 +140,8 @@ def student_dashboard(request):
     context = {
         'student': student,
         'staff': staff,
-        'messages': messages
-        # 'exams': exams,
+        'messages': messages,
+        "exams": exams
         
     }
     
@@ -251,15 +251,6 @@ def upload_notes(request):
 
     return redirect("staff_dashboard")  # Redirect after POST
 
-# def start_exam(request):
-#     if request.method == "POST":
-#         course_id = request.POST.get("course")
-#         course = get_object_or_404(Course, id=course_id)
-
-#         # Redirect to the exam page with the selected course
-#         return render(request, "exam_page.html", {"course": course})
-
-#     return redirect("staff_dashboard")  # Redirect back if accessed incorrectly
 
 
 @login_required
@@ -279,3 +270,97 @@ def delete_message(request, message_id):
         message.delete()
 
     return redirect("staff_dashboard")
+
+def create_exam(request):
+    staff = get_object_or_404(Staff, user=request.user)
+
+    if request.method == "POST":
+        title = request.POST["title"]
+        date = request.POST["date"]
+        duration = request.POST["duration"]
+
+        exam = Exam.objects.create(
+            staff=staff, course=staff.course, title=title, date=date, duration=duration
+        )
+        return redirect("add_question", exam_id=exam.id)
+
+    return render(request, "create_exam.html", {"staff": staff})
+
+@login_required
+def add_question(request, exam_id):
+    exam = get_object_or_404(Exam, id=exam_id, staff__user=request.user)
+
+    if request.method == "POST":
+        question_text = request.POST["question_text"]
+        option1 = request.POST["option1"]
+        option2 = request.POST["option2"]
+        option3 = request.POST["option3"]
+        option4 = request.POST["option4"]
+        correct_option = request.POST["correct_option"]
+
+        Question.objects.create(
+            exam=exam,
+            question_text=question_text,
+            option1=option1,
+            option2=option2,
+            option3=option3,
+            option4=option4,
+            correct_option=correct_option,
+        )
+        return redirect("staff_dashboard")
+
+    return render(request, "add_question.html", {"exam": exam})
+
+
+@login_required
+def take_exam(request, exam_id):
+    student = get_object_or_404(Student, user=request.user)
+    exam = get_object_or_404(Exam, id=exam_id, course=student.course)
+    questions = exam.questions.all()  # Fetch all related questions
+
+    if request.method == "POST":
+        score = 0
+        total_questions = questions.count()
+
+        for question in questions:
+            selected_option = request.POST.get(f"question_{question.id}", None)
+
+            if selected_option:
+                # Avoid duplicate responses
+                ExamResponse.objects.update_or_create(
+                    student=student, exam=exam, question=question,
+                    defaults={"selected_option": selected_option}
+                )
+
+                if selected_option == question.correct_option:
+                    score += 1
+
+        # Save exam result
+        ExamResult.objects.update_or_create(
+            student=student, exam=exam,
+            defaults={"score": score, "total_questions": total_questions}
+        )
+
+        return redirect("view_exam_results", exam_id=exam.id,)
+
+
+    return render(request, "take_exam.html", {"exam": exam, "questions": questions})
+
+
+@login_required
+def view_exam_results(request, exam_id):
+    exam = get_object_or_404(Exam, id=exam_id)  # Ensure exam exists
+
+    # If the user is a student, check if they are enrolled in this exam's course
+    if hasattr(request.user, "student"):  
+        student = request.user.student  # Get logged-in student
+        if student.course != exam.course:
+            return HttpResponse("You are not enrolled in this exam.", status=403)
+
+        # Fetch only this student's results
+        results = ExamResult.objects.filter(exam=exam, student=student)
+    else:
+        # If the user is a staff member, show all student results
+        results = ExamResult.objects.filter(exam=exam)
+
+    return render(request, "view_exam_results.html", {"exam": exam, "results": results})
