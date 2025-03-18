@@ -87,6 +87,7 @@
         <a href="#"><i class="fas fa-file-upload"></i> Upload Notes</a>
         <a href="{% url 'registered_students' %}"><i class="fas fa-users"></i> Students</a>
         <a href="{% url 'create_exam' %}"><i class="fas fa-chalkboard-teacher"></i> Start Exam</a>
+        <a href="{% url 'student_result' %}"><i class="fas fa-chart-bar"></i> Exam Results</a>
         <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
 
@@ -171,6 +172,41 @@
                 <li class="list-group-item text-muted">No messages yet.</li>
             {% endfor %}
         </ul>
+
+
+        <!-- <h3>Exam Results</h3>
+
+{% for exam, results in exam_results.items %}
+    <h4>{{ exam.title }} (Date: {{ exam.date }})</h4>
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Student Name</th>
+                <th>Score</th>
+                <th>Total Questions</th>
+                <th>Percentage</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.student.name }}</td>
+                <td>{{ result.score }}</td>
+                <td>{{ result.total_questions }}</td>
+                <td>{{ result.score|floatformat:2 }}%</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">No students have attended this exam yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% empty %}
+    <p>No exams available.</p>
+{% endfor %} -->
+
+
         
     </div>
 
