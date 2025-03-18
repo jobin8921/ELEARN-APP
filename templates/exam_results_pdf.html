@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Exam Results</title>
+    <title>{{ exam.name }} - Exam Results</title>
     <style>
         body { font-family: Arial, sans-serif; }
         .title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
@@ -12,30 +12,28 @@
     </style>
 </head>
 <body>
-    <h2>Exam Results</h2>
-    {% for exam, results in exam_results.items %}
-        <div class="title">{{ exam.name }} - {{ exam.course.name }}</div>
-        <table>
-            <thead>
+    <h2>Exam: {{ exam.title }}</h2>
+    <h3>Course: {{ exam.course.name }}</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in exam_results %}
                 <tr>
-                    <th>Student Name</th>
-                    <th>Score</th>
+                    <td>{{ result.student.name }}</td>
+                    <td>{{ result.score }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for result in results %}
-                    <tr>
-                        <td>{{ result.student.name }}</td>
-                        <td>{{ result.score }}</td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="2">No students have taken this exam yet.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <br>
-    {% endfor %}
+            {% empty %}
+                <tr>
+                    <td colspan="2">No students have taken this exam yet.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
