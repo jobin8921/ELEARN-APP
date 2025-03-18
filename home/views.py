@@ -233,19 +233,25 @@ def add_course(request):
     if request.method == "POST":
         name = request.POST["name"]
         description = request.POST["description"]
-        Course.objects.create(name=name, description=description)
+        amount = request.POST["amount"]
+        duration = request.POST["duration"]
+
+        Course.objects.create(name=name, description=description, amount=amount, duration=duration)
         return redirect("admin_dashboard")
+
     return render(request, "add_courses.html")
 
 
 def course_preview(request):
-    return render(request, 'courses.html') 
+    courses = Course.objects.all()
+    return render(request, 'courses.html', {"courses": courses}) 
 
 def available_courses(request):
     student = Student.objects.get(user=request.user)
     courses = Course.objects.all()
     registered_courses = StudentCourseRegistration.objects.filter(student=student).values_list("course_id", flat=True)
     return render(request, "available_courses.html", {"courses": courses, "registered_courses": registered_courses})
+
 
 def upload_notes(request):
     if request.method == "POST":

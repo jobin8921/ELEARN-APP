@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 class Course(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Course price
+    duration = models.CharField(max_length=50, default="") 
 
 # Model for Student
 class Student(models.Model):
