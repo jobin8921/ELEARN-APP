@@ -419,3 +419,13 @@ def generate_exam_results_pdf(request, exam_id):
         return HttpResponse("Error generating PDF", status=500)
 
     return response
+
+
+def delete_exam(request, exam_id):
+    exam = get_object_or_404(Exam, id=exam_id)
+    
+    if request.method == "POST":
+        exam.delete()
+        messages.success(request, "Exam deleted successfully!")
+    
+    return redirect('student_result') 
