@@ -89,6 +89,7 @@
 											<li><a href="{% url 'admin_dashboard' %}"><i class="fa fa-clone"></i>Admin</a></li>
 									
 											<!-- Account Dropdown -->
+											<!-- Account Dropdown -->
 											<li class="dropdown">
 												{% if user.is_authenticated %}
 													<a href="#" class="dropdown-toggle d-flex flex-column align-items-center" id="authDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -100,6 +101,11 @@
 														{% endif %}
 													</a>
 													<ul class="dropdown" aria-labelledby="authDropdown">
+														{% if user.is_staff %}
+															<li><a class="dropdown-item" href="{% url 'staff_dashboard' %}">{{ user.staff.name }} Dashboard</a></li>
+														{% else %}
+															<li><a class="dropdown-item" href="{% url 'student_dashboard' %}">{{ user.student.name }} Dashboard</a></li>
+														{% endif %}
 														<li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
 													</ul>
 												{% else %}
@@ -112,6 +118,7 @@
 													</ul>
 												{% endif %}
 											</li>
+
 											
 										<!-- End Main Menu -->
 									</div>
