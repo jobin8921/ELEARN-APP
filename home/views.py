@@ -49,7 +49,7 @@ def login_student(request):
             student = Student.objects.filter(user=user).first()
             if student and student.is_approved:
                 login(request, user)
-                return redirect('student_dashboard')
+                return redirect(index)
             return render(request, 'login_student.html', {'error': 'Approval Pending or Rejected'})
         return render(request, 'login_student.html', {'error': 'Invalid Credentials'})
     return render(request, 'login_Student.html')
@@ -101,8 +101,10 @@ def login_staff(request):
         if user:
             staff = Staff.objects.filter(user=user).first()
             if staff and staff.is_approved:
+                user.is_staff = True
+                user.save(update_fields=["is_staff"])
                 login(request, user)
-                return redirect('staff_dashboard')
+                return redirect(index)
             return render(request, 'login_staff.html', {'error': 'Approval Pending or Rejected'})
         return render(request, 'login_staff.html', {'error' : 'Invalid Credentials'})
     return render(request, 'login_staff.html')
@@ -231,19 +233,25 @@ def add_course(request):
     if request.method == "POST":
         name = request.POST["name"]
         description = request.POST["description"]
-        Course.objects.create(name=name, description=description)
+        amount = request.POST["amount"]
+        duration = request.POST["duration"]
+
+        Course.objects.create(name=name, description=description, amount=amount, duration=duration)
         return redirect("admin_dashboard")
+
     return render(request, "add_courses.html")
 
 
 def course_preview(request):
-    return render(request, 'courses.html') 
+    courses = Course.objects.all()
+    return render(request, 'courses.html', {"courses": courses}) 
 
 def available_courses(request):
     student = Student.objects.get(user=request.user)
     courses = Course.objects.all()
     registered_courses = StudentCourseRegistration.objects.filter(student=student).values_list("course_id", flat=True)
     return render(request, "available_courses.html", {"courses": courses, "registered_courses": registered_courses})
+
 
 def upload_notes(request):
     if request.method == "POST":
