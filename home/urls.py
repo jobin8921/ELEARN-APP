@@ -39,7 +39,7 @@ urlpatterns = [
     path("exam_result/<int:exam_id>/", views.view_exam_results, name="view_exam_results"),  # Fix name
 
     path("exam-results/", views.student_result, name="student_result"),
-    path("exam-results/pdf/", views.generate_exam_results_pdf, name="generate_exam_results_pdf"),
+    path("exam-results/pdf/<int:exam_id>/", views.generate_exam_results_pdf, name="generate_exam_results_pdf"),
 
 
 ]

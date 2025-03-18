@@ -395,19 +395,25 @@ def student_result(request):
     return render(request, "exam_results.html", {"exam_results": exam_results})
 
 
-def generate_exam_results_pdf(request):
+def generate_exam_results_pdf(request, exam_id):
     staff = Staff.objects.filter(user=request.user).first()
 
     if not staff:
-        return HttpResponse("Staff profile not found")
+        return HttpResponse("Staff profile not found", status=404)
 
-    exams = Exam.objects.filter(staff=staff).prefetch_related("examresult_set__student")
-    exam_results = {exam: ExamResult.objects.filter(exam=exam).select_related("student") for exam in exams}
+    # Get the specific exam
+    exam = get_object_or_404(Exam, id=exam_id, staff=staff)
 
-    html_content = render_to_string("exam_results_pdf.html", {"exam_results": exam_results})
+    # Fetch results only for this exam
+    exam_results = ExamResult.objects.filter(exam=exam).select_related("student")
+
+    html_content = render_to_string("exam_results_pdf.html", {"exam": exam, "exam_results": exam_results})
+    
+    # Create PDF response
     response = HttpResponse(content_type="application/pdf")
     response["content-Disposition"] = "attachment; filename=exam_results.pdf"
 
+    # Generate PDF
     pisa_status = pisa.CreatePDF(html_content, dest=response)
     if pisa_status.err:
         return HttpResponse("Error generating PDF", status=500)
