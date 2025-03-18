@@ -49,7 +49,7 @@ def login_student(request):
             student = Student.objects.filter(user=user).first()
             if student and student.is_approved:
                 login(request, user)
-                return redirect('student_dashboard')
+                return redirect(index)
             return render(request, 'login_student.html', {'error': 'Approval Pending or Rejected'})
         return render(request, 'login_student.html', {'error': 'Invalid Credentials'})
     return render(request, 'login_Student.html')
@@ -101,8 +101,10 @@ def login_staff(request):
         if user:
             staff = Staff.objects.filter(user=user).first()
             if staff and staff.is_approved:
+                user.is_staff = True
+                user.save(update_fields=["is_staff"])
                 login(request, user)
-                return redirect('staff_dashboard')
+                return redirect(index)
             return render(request, 'login_staff.html', {'error': 'Approval Pending or Rejected'})
         return render(request, 'login_staff.html', {'error' : 'Invalid Credentials'})
     return render(request, 'login_staff.html')

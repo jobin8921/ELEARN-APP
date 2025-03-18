@@ -75,25 +75,47 @@
 									<div class="navbar-collapse">
 										<!-- Main Menu -->
 										<ul id="nav" class="nav menu navbar-nav">
-
 											<li class="active"><a href="/"><i class="fa fa-home"></i>Home</a></li>
-
-											<li><a href="#"><i class="fa fa-clone"></i>Pages</a> 
+									
+											<li><a href="#"><i class="fa fa-clone"></i>Pages</a>
 												<ul class="dropdown">
 													<li><a href="teachers.html">Teachers</a></li>
 												</ul>
 											</li>
-
+									
 											<li><a href="{% url 'course_preview' %}"><i class="fa fa-clone"></i>Our Courses</a></li>
 											<li><a href="events.html"><i class="fa fa-bullhorn"></i>Events</a></li>
-											<li><a href=""><i class="fa fa-address-book"></i>Contact</a> </li>
-											<li><a href="{% url 'login_staff' %}"><i class="fa fa-clone"></i>Staff</a> </li>
-											<li><a href="{% url 'login_student'%}"><i class="fa fa-clone"></i>Student</a> </li>
-											<li><a href="{% url 'admin_dashboard' %}"><i class="fa fa-clone"></i>Admin</a> </li>
+											<li><a href=""><i class="fa fa-address-book"></i>Contact</a></li>
+											<li><a href="{% url 'admin_dashboard' %}"><i class="fa fa-clone"></i>Admin</a></li>
+									
+											<!-- Account Dropdown -->
+											<li class="dropdown">
+												{% if user.is_authenticated %}
+													<a href="#" class="dropdown-toggle d-flex flex-column align-items-center" id="authDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+														<i class="fa"></i> {{ user.username }} 
+														{% if user.is_staff %}
+															<span class="badge bg-primary">Staff</span>
+														{% else %}
+															<span class="badge bg-success">Student</span>
+														{% endif %}
+													</a>
+													<ul class="dropdown" aria-labelledby="authDropdown">
+														<li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+													</ul>
+												{% else %}
+													<a href="#" class="dropdown-toggle" id="authDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+														<i class="fa"></i> Account
+													</a>
+													<ul class="dropdown" aria-labelledby="authDropdown">
+														<li><a class="dropdown-item" href="{% url 'login_staff' %}">Staff Login</a></li>
+														<li><a class="dropdown-item" href="{% url 'login_student' %}">Student Login</a></li>
+													</ul>
+												{% endif %}
+											</li>
 											
-										</ul>
 										<!-- End Main Menu -->
-									</div> 
+									</div>
+									
 								</nav>
 								<!-- Search Area -->
 								<div class="search-area">
