@@ -8,13 +8,7 @@
             <div class="col-lg-4 col-md-6 col-sm-8">
                 <div class="form-container">
                     <h2 class="text-center">Staff Registration</h2>
-                                {% if messages %}
-                                    <div class="alert alert-info">
-                                        {% for message in messages %}
-                                            <p>{{ message }}</p>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
+                                
 
                     <form method="POST" class="mt-4">
                         {% csrf_token %}
@@ -46,6 +40,14 @@
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Register</button>
                     </form>
+                    
+
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+            
                     <div class="text-center mt-3">
                         <a href="{% url 'login_staff' %}">Already have an account? Login</a>
                     </div>
