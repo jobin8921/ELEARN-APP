@@ -88,7 +88,7 @@ def register_staff(request):
         )
 
         messages.success(request, "Registration successful! Wait for admin approval before logging in.")
-        return redirect("login_staff")
+        return redirect("register_staff")
 
     return render(request, 'register_staff.html')
 
