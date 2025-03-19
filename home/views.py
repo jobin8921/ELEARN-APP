@@ -11,7 +11,8 @@ from xhtml2pdf import pisa
 
 
 def index(request):
-    return render(request, 'index.html')
+    courses = Course.objects.all()
+    return render(request, 'index.html',{'courses':courses})
 
 def register_student(request):
     if request.method == "POST":
