@@ -14,6 +14,9 @@ def index(request):
     courses = Course.objects.all()
     return render(request, 'index.html',{'courses':courses})
 
+def teachers(request):
+    return render(request,'teachers.html')
+
 def register_student(request):
     if request.method == "POST":
         username = request.POST["username"]
