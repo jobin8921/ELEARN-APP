@@ -43,4 +43,6 @@ urlpatterns = [
 
     path('delete_exam/<int:exam_id>/', views.delete_exam, name='delete_exam'),
 
+    path('teachers/',views.teachers,name='teachers')
+
 ]
