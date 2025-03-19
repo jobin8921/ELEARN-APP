@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from .models import Student, Staff, Course, Message
+from .models import Student, Staff, Course, Message,Exam, Question, ExamResponse, ExamResult
 from django.contrib import messages
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
 
 
 def index(request):
@@ -47,7 +49,7 @@ def login_student(request):
             student = Student.objects.filter(user=user).first()
             if student and student.is_approved:
                 login(request, user)
-                return redirect('student_dashboard')
+                return redirect(index)
             return render(request, 'login_student.html', {'error': 'Approval Pending or Rejected'})
         return render(request, 'login_student.html', {'error': 'Invalid Credentials'})
     return render(request, 'login_Student.html')
@@ -99,8 +101,10 @@ def login_staff(request):
         if user:
             staff = Staff.objects.filter(user=user).first()
             if staff and staff.is_approved:
+                user.is_staff = True
+                user.save(update_fields=["is_staff"])
                 login(request, user)
-                return redirect('staff_dashboard')
+                return redirect(index)
             return render(request, 'login_staff.html', {'error': 'Approval Pending or Rejected'})
         return render(request, 'login_staff.html', {'error' : 'Invalid Credentials'})
     return render(request, 'login_staff.html')
@@ -127,11 +131,13 @@ def student_dashboard(request):
         return render(request, 'error.html', {'message': 'Student profile not found'})
 
     # Get assigned staff
+    exams = Exam.objects.filter(course=student.course)
+
     staff = Staff.objects.filter(course=student.course).first()
 
+    taken_exam_ids = ExamResult.objects.filter(student=student).values_list("exam_id", flat=True)
 
-    # Get upcoming and ongoing exams for the student's course
-    # exams = Exam.objects.filter(course=student.course)
+
 
     # Get notifications for the student
     messages = Message.objects.filter(course=student.course).order_by("-created_at")
@@ -140,8 +146,9 @@ def student_dashboard(request):
     context = {
         'student': student,
         'staff': staff,
-        'messages': messages
-        # 'exams': exams,
+        'messages': messages,
+        "exams": exams,
+        "taken_exam_ids": taken_exam_ids
         
     }
     
@@ -154,6 +161,9 @@ def staff_dashboard(request):
     if not staff:
         return HttpResponse("Staff profile not found")
 
+    exams = Exam.objects.filter(staff=staff).prefetch_related("examresult_set__student")
+
+    exam_results = {exam: ExamResult.objects.filter(exam=exam).select_related("student") for exam in exams} if exams else {}
     # Fetch students who are assigned to the same course
     students = Student.objects.filter(course=staff.course)
 
@@ -173,7 +183,7 @@ def staff_dashboard(request):
     return render(
         request, 
         "staff_dashboard.html", 
-        {"staff": staff, "students": students, "messages": messages}
+        {"staff": staff, "students": students, "messages": messages, "exam_results": exam_results,}
     )
 
 def approve_user(request, user_id, role):
@@ -223,19 +233,25 @@ def add_course(request):
     if request.method == "POST":
         name = request.POST["name"]
         description = request.POST["description"]
-        Course.objects.create(name=name, description=description)
+        amount = request.POST["amount"]
+        duration = request.POST["duration"]
+
+        Course.objects.create(name=name, description=description, amount=amount, duration=duration)
         return redirect("admin_dashboard")
+
     return render(request, "add_courses.html")
 
 
 def course_preview(request):
-    return render(request, 'courses.html') 
+    courses = Course.objects.all()
+    return render(request, 'courses.html', {"courses": courses}) 
 
 def available_courses(request):
     student = Student.objects.get(user=request.user)
     courses = Course.objects.all()
     registered_courses = StudentCourseRegistration.objects.filter(student=student).values_list("course_id", flat=True)
     return render(request, "available_courses.html", {"courses": courses, "registered_courses": registered_courses})
+
 
 def upload_notes(request):
     if request.method == "POST":
@@ -251,15 +267,6 @@ def upload_notes(request):
 
     return redirect("staff_dashboard")  # Redirect after POST
 
-# def start_exam(request):
-#     if request.method == "POST":
-#         course_id = request.POST.get("course")
-#         course = get_object_or_404(Course, id=course_id)
-
-#         # Redirect to the exam page with the selected course
-#         return render(request, "exam_page.html", {"course": course})
-
-#     return redirect("staff_dashboard")  # Redirect back if accessed incorrectly
 
 
 @login_required
@@ -279,3 +286,154 @@ def delete_message(request, message_id):
         message.delete()
 
     return redirect("staff_dashboard")
+
+def create_exam(request):
+    staff = get_object_or_404(Staff, user=request.user)
+
+    if request.method == "POST":
+        title = request.POST["title"]
+        date = request.POST["date"]
+        duration = request.POST["duration"]
+
+        exam = Exam.objects.create(
+            staff=staff, course=staff.course, title=title, date=date, duration=duration
+        )
+        return redirect("add_question", exam_id=exam.id)
+
+    return render(request, "create_exam.html", {"staff": staff})
+
+@login_required
+def add_question(request, exam_id):
+    exam = get_object_or_404(Exam, id=exam_id, staff__user=request.user)
+
+    if request.method == "POST":
+        questions_data = request.POST.getlist('question_text[]')
+        option1_data = request.POST.getlist('option1[]')
+        option2_data = request.POST.getlist('option2[]')
+        option3_data = request.POST.getlist('option3[]')
+        option4_data = request.POST.getlist('option4[]')
+        correct_option_data = request.POST.getlist('correct_option[]')
+
+        for i in range(len(questions_data)):
+            if questions_data[i].strip():
+                Question.objects.create(
+                    exam=exam,
+                    question_text=questions_data[i],
+                    option1=option1_data[i],
+                    option2=option2_data[i],
+                    option3=option3_data[i],
+                    option4=option4_data[i],
+                    correct_option=correct_option_data[i],
+                )
+
+        return redirect("staff_dashboard")
+
+    return render(request, "add_question.html", {"exam": exam})
+
+
+
+@login_required
+def take_exam(request, exam_id):
+    student = get_object_or_404(Student, user=request.user)
+    exam = get_object_or_404(Exam, id=exam_id, course=student.course)
+    questions = exam.questions.all()
+
+    if request.method == "POST":
+        score = 0
+        responses = []
+
+        for question in questions:
+            selected_option = request.POST.get(f"question_{question.id}")  # Get selected answer
+
+            if selected_option:
+                # Store responses in a list to bulk update later
+                responses.append(ExamResponse(
+                    student=student,
+                    exam=exam,
+                    question=question,
+                    selected_option=selected_option
+                ))
+
+                # Check if the selected answer is correct
+                if selected_option == question.correct_option:
+                    score += 1
+
+        # Bulk update exam responses
+        ExamResponse.objects.bulk_create(responses, ignore_conflicts=True)
+
+        # Save or update exam result
+        ExamResult.objects.update_or_create(
+            student=student, exam=exam,
+            defaults={"score": score, "total_questions": len(questions)}
+        )
+
+        return redirect("view_exam_results", exam_id=exam.id)
+
+    return render(request, "take_exam.html", {"exam": exam, "questions": questions})
+
+
+
+@login_required
+def view_exam_results(request, exam_id):
+    exam = get_object_or_404(Exam, id=exam_id)  # Ensure exam exists
+
+    # If the user is a student, check if they are enrolled in this exam's course
+    if hasattr(request.user, "student"):  
+        student = request.user.student  # Get logged-in student
+        if student.course != exam.course:
+            return HttpResponse("You are not enrolled in this exam.", status=403)
+
+        # Fetch only this student's results
+        results = ExamResult.objects.filter(exam=exam, student=student)
+    else:
+        # If the user is a staff member, show all student results
+        results = ExamResult.objects.filter(exam=exam)
+
+    return render(request, "view_exam_results.html", {"exam": exam, "results": results})
+
+def student_result(request):
+    staff = Staff.objects.filter(user=request.user).first()
+
+    if not staff:
+        return HttpResponse("Staff profile not found")
+
+    exams = Exam.objects.filter(staff=staff).prefetch_related("examresult_set__student")
+    exam_results = {exam: ExamResult.objects.filter(exam=exam).select_related("student") for exam in exams}
+
+    return render(request, "exam_results.html", {"exam_results": exam_results})
+
+
+def generate_exam_results_pdf(request, exam_id):
+    staff = Staff.objects.filter(user=request.user).first()
+
+    if not staff:
+        return HttpResponse("Staff profile not found", status=404)
+
+    # Get the specific exam
+    exam = get_object_or_404(Exam, id=exam_id, staff=staff)
+
+    # Fetch results only for this exam
+    exam_results = ExamResult.objects.filter(exam=exam).select_related("student")
+
+    html_content = render_to_string("exam_results_pdf.html", {"exam": exam, "exam_results": exam_results})
+    
+    # Create PDF response
+    response = HttpResponse(content_type="application/pdf")
+    response["content-Disposition"] = "attachment; filename=exam_results.pdf"
+
+    # Generate PDF
+    pisa_status = pisa.CreatePDF(html_content, dest=response)
+    if pisa_status.err:
+        return HttpResponse("Error generating PDF", status=500)
+
+    return response
+
+
+def delete_exam(request, exam_id):
+    exam = get_object_or_404(Exam, id=exam_id)
+    
+    if request.method == "POST":
+        exam.delete()
+        messages.success(request, "Exam deleted successfully!")
+    
+    return redirect('student_result') 

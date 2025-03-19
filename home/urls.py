@@ -33,4 +33,14 @@ urlpatterns = [
 
     path("delete_message/<int:message_id>/", views.delete_message, name="delete_message"),
 
+    path("create_exam/", views.create_exam, name="create_exam"),
+    path("add_question/<int:exam_id>/", views.add_question, name="add_question"),
+    path("take_exam/<int:exam_id>/", views.take_exam, name="take_exam"),
+    path("exam_result/<int:exam_id>/", views.view_exam_results, name="view_exam_results"),  # Fix name
+
+    path("exam-results/", views.student_result, name="student_result"),
+    path("exam-results/pdf/<int:exam_id>/", views.generate_exam_results_pdf, name="generate_exam_results_pdf"),
+
+    path('delete_exam/<int:exam_id>/', views.delete_exam, name='delete_exam'),
+
 ]
