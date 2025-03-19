@@ -44,7 +44,9 @@
                         <select name="course" class="form-select" required>
                             <option value="" disabled selected>Select Course</option>
                             {% for course in courses %}
-                                <option value="{{ course.id }}">{{ course.name }}</option>
+                                <option value="{{ course.id }}">
+                                    {{ course.name }} - ₹{{ course.amount }}
+                                </option>
                             {% endfor %}
                         </select>
                     </div>
