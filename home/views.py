@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from .models import Student, Staff, Course, Message,Exam, Question, ExamResponse, ExamResult
+from .models import Student, Staff, Course, Message,Exam, Question, ExamResponse, ExamResult,Event
 from django.contrib import messages
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -12,7 +12,8 @@ from xhtml2pdf import pisa
 
 def index(request):
     courses = Course.objects.all()
-    return render(request, 'index.html',{'courses':courses})
+    events=Event.objects.all()
+    return render(request, 'index.html',{'courses':courses,'events':events})
 
 def teachers(request):
     return render(request,'teachers.html')
@@ -122,7 +123,8 @@ def admin_dashboard(request):
     students = Student.objects.all()
     staff = Staff.objects.all()
     courses = Course.objects.all()
-    return render(request, "admin_dashboard.html", {"students": students, "staff": staff, "courses": courses})
+    events=Event.objects.all()
+    return render(request, "admin_dashboard.html", {"students": students, "staff": staff, "courses": courses,'events':events})
 
 def student_dashboard(request):
     # Get the logged-in user
@@ -441,3 +443,24 @@ def delete_exam(request, exam_id):
         messages.success(request, "Exam deleted successfully!")
     
     return redirect('student_result') 
+
+# def event_list(request):
+#     events=Event.objects.all().order_by('event_date')
+#     return render(request,'index.html',{'events':events})
+
+def create_event(request):
+    if request.method=="POST":
+        title=request.POST['title']
+        description=request.POST['description']
+        event_date=request.POST['event_date']
+
+        Event.objects.create(title=title,description=description,event_date=event_date)
+        return redirect('index')
+    
+    return render(request,'create_event.html')
+
+def delete_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    event.delete()
+    messages.success(request, "Event deleted successfully.")
+    return redirect('admin_dashboard')  # Redirect to admin dashboard after deletion

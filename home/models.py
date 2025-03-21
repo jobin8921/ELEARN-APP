@@ -82,3 +82,9 @@ class ExamResult(models.Model):
     score = models.IntegerField()
     total_questions = models.IntegerField()
     date_submitted = models.DateTimeField(auto_now_add=True)
+
+
+class Event(models.Model):
+    title=models.CharField(max_length=255)
+    description=models.TextField()
+    event_date=models.DateField()
