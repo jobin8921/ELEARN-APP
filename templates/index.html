@@ -272,5 +272,63 @@
 			</div>
 		</div>
 		<!--/ End Clients CSS -->
+
+		<!-- Registration Modal -->
+		<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="registerModalLabel">Student Registration</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<form method="POST" action="{% url 'register_student' %}">
+							{% csrf_token %}
+
+							<div class="mb-3">
+								<input type="text" name="username" class="form-control" placeholder="Username" required>
+							</div>
+
+							<div class="mb-3">
+								<input type="text" name="name" class="form-control" placeholder="Full Name" required>
+							</div>
+
+							<div class="mb-3">
+								<input type="email" name="email" class="form-control" placeholder="Email" required>
+							</div>
+
+							<div class="mb-3">
+								<input type="text" name="phone" class="form-control" placeholder="Phone Number" required>
+							</div>
+
+							<div class="mb-3">
+								<input type="password" name="password" class="form-control" placeholder="Password" required>
+							</div>
+
+							<div class="mb-3">
+								<select name="gender" class="form-select" required>
+									<option value="" disabled selected>Select Gender</option>
+									<option value="Male">Male</option>
+									<option value="Female">Female</option>
+									<option value="Other">Other</option>
+								</select>
+							</div>
+
+							<div class="mb-3">
+								<select name="course" class="form-select" required>
+									<option value="" disabled selected>Select Course</option>
+									{% for course in courses %}
+										<option value="{{ course.id }}">{{ course.name }} - ₹{{ course.amount }}</option>
+									{% endfor %}
+								</select>
+							</div>
+
+							<button type="submit" class="btn btn-primary w-100">Register</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		{% endblock %}
 		

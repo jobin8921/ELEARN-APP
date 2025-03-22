@@ -115,6 +115,10 @@
 													<ul class="dropdown" aria-labelledby="authDropdown">
 														<li><a class="dropdown-item" href="{% url 'login_staff' %}">Staff Login</a></li>
 														<li><a class="dropdown-item" href="{% url 'login_student' %}">Student Login</a></li>
+														<li><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
+															Register
+														</button>
+														</li>
 													</ul>
 												{% endif %}
 											</li>
