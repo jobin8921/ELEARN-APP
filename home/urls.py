@@ -43,4 +43,11 @@ urlpatterns = [
 
     path('delete_exam/<int:exam_id>/', views.delete_exam, name='delete_exam'),
 
+    path('teachers/',views.teachers,name='teachers'),
+
+    # path('events/', views.event_list, name='event_list'),
+
+    path('events_create/',views.create_event,name='events_create'),
+
+    path('delete_event/<int:event_id>/', views.delete_event, name='delete_event'),
 ]
