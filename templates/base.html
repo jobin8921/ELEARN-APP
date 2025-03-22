@@ -85,7 +85,7 @@
 									
 											<li><a href="{% url 'course_preview' %}"><i class="fa fa-clone"></i>Our Courses</a></li>
 											<li><a href="#events"><i class="fa fa-bullhorn"></i>Events</a></li>
-											<li><a href=""><i class="fa fa-address-book"></i>Contact</a></li>
+											<li><a href="#contact"><i class="fa fa-address-book"></i>Contact</a></li>
 											<li><a href="{% url 'admin_dashboard' %}"><i class="fa fa-clone"></i>Admin</a></li>
 									
 											<!-- Account Dropdown -->
@@ -109,15 +109,13 @@
 														<li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
 													</ul>
 												{% else %}
-													<a href="#" class="dropdown-toggle" id="authDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-														<i class="fa"></i> Account
-													</a>
+												<button class="btn btn-primary dropdown-toggle rounded-pill py-2 px-4" type="button" id="authDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+													Account
+												</button>
 													<ul class="dropdown" aria-labelledby="authDropdown">
 														<li><a class="dropdown-item" href="{% url 'login_staff' %}">Staff Login</a></li>
 														<li><a class="dropdown-item" href="{% url 'login_student' %}">Student Login</a></li>
-														<li><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
-															Register
-														</button>
+														<li><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">Register</button>
 														</li>
 													</ul>
 												{% endif %}
@@ -212,7 +210,7 @@
 			</div>
 			<!--/ End Footer Top -->
 			<!-- Footer Bottom -->
-			<div class="footer-bottom">
+			<div id="contact" class="footer-bottom">
 				<div class="container">
 					<div class="row">
 						<div class="col-12">
