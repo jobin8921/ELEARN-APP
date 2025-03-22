@@ -455,7 +455,7 @@ def create_event(request):
         event_date=request.POST['event_date']
 
         Event.objects.create(title=title,description=description,event_date=event_date)
-        return redirect('index')
+        return redirect('admin_dashboard')
     
     return render(request,'create_event.html')
 
