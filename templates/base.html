@@ -52,97 +52,74 @@
 		
     </head>
     <body>
-	
-		<!-- Header -->
-		<header class="header">
-			<!-- Header Inner -->
-			<div class="header-inner overlay">
-				<div class="container">
-					<div class="row">
-						<div class="col-lg-3 col-md-3 col-12">
-							<!-- Logo -->
-							<div class="logo">
+	<!-- Header -->
+<header class="header">
+    <!-- Header Inner -->
+    <div class="header-inner overlay">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-12">
+                    <!-- Logo -->
+                    <div class="logo">
+                        <a href="/"><img src="{% static 'images/logo.png' %}" alt="#"></a>
+                    </div>
+                    <!--/ End Logo -->
+                    <div class="mobile-menu"></div>
+                </div>
+                <div class="col-lg-9 col-md-9 col-12">
+                    <div class="menu-bar">
+                        <nav class="navbar navbar-default">
+                            <div class="navbar-collapse">
+                                <!-- Main Menu -->
+                                <ul id="nav" class="nav menu navbar-nav">
+                                    <li class="active"><a href="/"><i class="fa fa-home"></i>Home</a></li>
+                                    <li><a href="#"><i class="fa fa-clone"></i>Pages</a>
+                                        <ul class="dropdown">
+                                            <li><a href="{% url 'teachers' %}">Teachers</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="{% url 'course_preview' %}"><i class="fa fa-clone"></i>Our Courses</a></li>
+                                    <li><a href="#events"><i class="fa fa-bullhorn"></i>Events</a></li>
+                                    <li><a href="#contact"><i class="fa fa-address-book"></i>Contact</a></li>
+                                    <li><a href="{% url 'admin_dashboard' %}"><i class="fa fa-clone"></i>Admin</a></li>
 
-								<a href="/"><img src="{% static 'images/logo.png' %}" alt="#"></a>
+                                    <!-- Student Dropdown -->
+                                    <li><a href="#"><i class="fa fa-clone"></i>Student</a>
+                                        <ul class="dropdown">
+                                            <li><a href="{% url 'teachers' %}">Login</a></li>
+											<li><a href="#" data-bs-toggle="modal" data-bs-target="#studentRegisterModal">Register</a></li>
+                                        </ul>
+                                    </li>
+                                    <!-- Staff Dropdown -->
+									<li><a href="#"><i class="fa fa-clone"></i>Staff</a>
+                                        <ul class="dropdown">
+                                            <li><a href="{% url 'teachers' %}">Login</a></li>
+											<li><a href="#" data-bs-toggle="modal" data-bs-target="#staffRegisterModal">Register</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <!-- End Main Menu -->
+                            </div>
+                        </nav>
+                        <!-- Search Area -->
+                        <div class="search-area">
+                            <a href="#header" class="icon"><i class="fa fa-search"></i></a>
+                            <form class="search-form">
+                                <input type="text" placeholder="ex: premium course" name="search">
+                                <button value="search" type="submit"><i class="fa fa-search"></i></button>
+                            </form>
+                        </div>    
+                        <!-- End Search Area-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ End Header Inner -->
+</header>
+<!--/ End Header -->
 
-							</div>
-							<!--/ End Logo -->
-							<div class="mobile-menu"></div>
-						</div>
-						<div class="col-lg-9 col-md-9 col-12">
-							<div class="menu-bar">
-								<nav class="navbar navbar-default">
-									<div class="navbar-collapse">
-										<!-- Main Menu -->
-										<ul id="nav" class="nav menu navbar-nav">
-											<li class="active"><a href="/"><i class="fa fa-home"></i>Home</a></li>
-									
-											<li><a href="#"><i class="fa fa-clone"></i>Pages</a>
-												<ul class="dropdown">
-													<li><a href="{% url 'teachers' %}">Teachers</a></li>
-												</ul>
-											</li>
-									
-											<li><a href="{% url 'course_preview' %}"><i class="fa fa-clone"></i>Our Courses</a></li>
-											<li><a href="#events"><i class="fa fa-bullhorn"></i>Events</a></li>
-											<li><a href="#contact"><i class="fa fa-address-book"></i>Contact</a></li>
-											<li><a href="{% url 'admin_dashboard' %}"><i class="fa fa-clone"></i>Admin</a></li>
-									
-											<!-- Account Dropdown -->
-											<!-- Account Dropdown -->
-											<li class="dropdown">
-												{% if user.is_authenticated %}
-													<a href="#" class="dropdown-toggle d-flex flex-column align-items-center" id="authDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-														<i class="fa"></i> {{ user.username }} 
-														{% if user.is_staff %}
-															<span class="badge bg-primary">Staff</span>
-														{% else %}
-															<span class="badge bg-success">Student</span>
-														{% endif %}
-													</a>
-													<ul class="dropdown" aria-labelledby="authDropdown">
-														{% if user.is_staff %}
-															<li><a class="dropdown-item" href="{% url 'staff_dashboard' %}">{{ user.staff.name }} Dashboard</a></li>
-														{% else %}
-															<li><a class="dropdown-item" href="{% url 'student_dashboard' %}">{{ user.student.name }} Dashboard</a></li>
-														{% endif %}
-														<li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-													</ul>
-												{% else %}
-												<button class="btn btn-primary dropdown-toggle rounded-pill py-2 px-4" type="button" id="authDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-													Account
-												</button>
-													<ul class="dropdown" aria-labelledby="authDropdown">
-														<li><a class="dropdown-item" href="{% url 'login_staff' %}">Staff Login</a></li>
-														<li><a class="dropdown-item" href="{% url 'login_student' %}">Student Login</a></li>
-														<li><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">Register</button>
-														</li>
-													</ul>
-												{% endif %}
-											</li>
 
-											
-										<!-- End Main Menu -->
-									</div>
-									
-								</nav>
-								<!-- Search Area -->
-								<div class="search-area">
-									<a href="#header" class="icon"><i class="fa fa-search"></i></a>
-									<form class="search-form">
-										<input type="text" placeholder="ex: premium course" name="search">
-										<button value="search " type="submit"><i class="fa fa-search"></i></button>
-									</form>
-								</div>	
-								<!-- End Search Area-->
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!--/ End Header Inner -->
-		</header>
-		<!--/ End Header -->
         <main>
             {% block content %}
             <!-- Content from child templates will be inserted here -->
