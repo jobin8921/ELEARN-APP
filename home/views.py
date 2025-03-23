@@ -54,10 +54,11 @@ def login_student(request):
             student = Student.objects.filter(user=user).first()
             if student and student.is_approved:
                 login(request, user)
-                return redirect(index)
-            return render(request, 'login_student.html', {'error': 'Approval Pending or Rejected'})
-        return render(request, 'login_student.html', {'error': 'Invalid Credentials'})
-    return render(request, 'login_Student.html')
+                return redirect('student_dashboard')
+            return render(request, 'index.html', {'error': 'Approval Pending or Rejected'})
+        return render(request, 'index.html', {'error': 'Invalid Credentials'})
+    return redirect(request, 'index')
+
 
 def register_staff(request):
     if request.method == "POST":
@@ -109,10 +110,10 @@ def login_staff(request):
                 user.is_staff = True
                 user.save(update_fields=["is_staff"])
                 login(request, user)
-                return redirect(index)
-            return render(request, 'login_staff.html', {'error': 'Approval Pending or Rejected'})
-        return render(request, 'login_staff.html', {'error' : 'Invalid Credentials'})
-    return render(request, 'login_staff.html')
+                return redirect('staff_dashboard')
+            return render(request, 'index.html', {'error': 'Approval Pending or Rejected'})
+        return render(request, 'index.html', {'error' : 'Invalid Credentials'})
+    return redirect(request, 'index.html')
 
 def logout_view(request):
     logout(request)
