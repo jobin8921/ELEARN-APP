@@ -362,5 +362,69 @@
         </div>
     </div>
 </div>
+
+
+<!-- Student Login Modal -->
+<div class="modal fade" id="studentLoginModal" tabindex="-1" aria-labelledby="studentLoginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="studentLoginModalLabel">Student Login</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'login_student' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <input type="text" name="username" class="form-control" placeholder="Username" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                    {% if error %} <p class="text-danger text-center mt-2">{{ error }}</p> {% endif %}
+                </form>
+                <div class="text-center mt-3">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#studentRegisterModal" data-bs-dismiss="modal">Don't have an account? Register</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Staff Login Modal -->
+<!-- Staff Login Modal -->
+<div class="modal fade" id="staffLoginModal" tabindex="-1" aria-labelledby="staffLoginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staffLoginModalLabel">Staff Login</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'login_staff' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <input type="text" name="username" class="form-control" placeholder="Username" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                    
+                    {% if staff_login_error %}
+                        <p class="text-danger text-center mt-2">{{ staff_login_error }}</p>
+                    {% endif %}
+                </form>
+                <div class="text-center mt-3">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#staffRegisterModal" data-bs-dismiss="modal">Don't have an account? Register</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 		{% endblock %}
 		
