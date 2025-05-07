@@ -120,9 +120,14 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Location for global static files
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 'staticfiles' is the folder where static files will be collected
+
+
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'staticfiles'),  # Include static files from the home app
+    os.path.join(BASE_DIR, 'home/static'),  # Include static files from the home app
 ]
+
+
 
 # Collect static files into this directory for production
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
