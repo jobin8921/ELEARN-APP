@@ -124,7 +124,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 'staticfiles' is the fold
 
 
 STATICFILES_DIRS = [
+<<<<<<< HEAD
     os.path.join(BASE_DIR, 'home/static'),  # Include static files from the home app
+=======
+
+    os.path.join(BASE_DIR, 'home/static'),  # Include static files from the home app
+
+
+>>>>>>> 2a6e8c65f16fdf405230fe671036d9f3a3495743
 ]
 
 
