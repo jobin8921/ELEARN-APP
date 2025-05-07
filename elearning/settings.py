@@ -121,7 +121,7 @@ STATIC_URL = '/static/'
 
 # Location for global static files
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Include static files from the home app
+    os.path.join(BASE_DIR, 'staticfiles'),  # Include static files from the home app
 ]
 
 # Collect static files into this directory for production
