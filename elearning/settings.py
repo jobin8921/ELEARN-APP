@@ -122,8 +122,12 @@ STATIC_URL = '/static/'
 # Location for global static files
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 'staticfiles' is the folder where static files will be collected
 
+# Add the global static directory here
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Global static folder
+]
 
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
+
 
 
 
