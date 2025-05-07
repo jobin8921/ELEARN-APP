@@ -1,3 +1,2 @@
-web: gunicorn elearning.wsgi
-release: python manage.py makemigrations home
-release: python manage.py migrate
+web: bash -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn elearning.wsgi"
+
