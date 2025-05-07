@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ze&p%j0qz8z+=gxe7zoe40a_duo#p-n4d%^#6c0jepsct43-=l'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['web-production-08634.up.railway.app']
 
 
 # Application definition
@@ -128,6 +128,12 @@ STATICFILES_DIRS = [
 ]
 
 
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> 6b5939d2e808b2845ea26bbcbd1e331284b580c0
 # Collect static files into this directory for production
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
